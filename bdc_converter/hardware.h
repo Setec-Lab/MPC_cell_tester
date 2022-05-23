@@ -87,6 +87,9 @@ int24_t                             ibatac = 0;
 uint16_t                            vbusav = 0;
 uint16_t                            vbatav = 0;
 int16_t                             ibatav = 0;
+
+//uint16_t                            num = 0;
+//uint16_t                            num0 = 0;
 //uint16_t                            capap = 0;
 //uint16_t                            cvref = 4800;
 //uint16_t                            ocref = 2000;
@@ -113,6 +116,7 @@ void UART_send_string(const char* st_pt);
 void UART_send_u16(uint16_t number); 
 void timing(void);
 void PAO(uint16_t pv_voltage, uint16_t pv_current, uint32_t* previous_power, char* previous_direction);
+//char* hexToAscii(char hex[]);
 
 
 #define     LINEBREAK               {UART_send_char(0xA); UART_send_char(0xD);}

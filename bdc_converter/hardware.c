@@ -41,17 +41,28 @@ void initialize()
     TMR1CS1 = 0;    //FOSC/4
     T1CKPS0 = 1;
     T1CKPS1 = 1;    // 8 millisecond
-    TMR1H = 0xE1;   //TMR1 Fosc/4= 8Mhz (Tosc= 0.125us)
-    TMR1L = 0x83;   //TMR1 counts: 7805 x 0.125us = 0.97562ms
+    
+    TMR1H = 0xFF;   //TMR1 (Fosc/4)/8 = 1Mhz (Tosc= 1us)
+    TMR1L = 0x9C;   //TMR1 counts:  (65536 - 65436) x 1us = 100us
+    
+    //TMR1H = 0xE1;   //TMR1 Fosc/4= 8Mhz (Tosc= 0.125us)
+    //TMR1L = 0x83;   //TMR1 counts: 7805 x 0.125us = 0.97562ms
     /** @b PSMC/PWM @b SETTINGS*/
     /** Programmable switch mode control (PSMC)*/
     PSMC1CON = 0x00; /// * Clear PSMC1 configuration to start
     PSMC1MDL = 0x00; /// * No modulation
     PSMC1CLK = 0x01; /// * Driven by 64MHz PLL system clock
-    PSMC1PRH = 0x01; /// * Set period high register to 0x01
+    PSMC1PRH = 0x18; /// * Set period high register to 0x18
     PSMC1PRL = 0xFF; /// * Set period low register to 0xFF
+    /** 6399 + 1 clock cycles for period that is 100us (10KHz)*/
+    /** This set the PWM with 9 bit of resolution*/
+    
+    //PSMC1PRH = 0x01; /// * Set period high register to 0x01
+    //PSMC1PRL = 0xFF; /// * Set period low register to 0xFF
     /** 511 + 1 clock cycles for period that is 8us (125KHz)*/
     /** This set the PWM with 9 bit of resolution*/
+    
+    
     /** Duty cycle*/
     PSMC1DCH = 0x00;                    // * Set duty cycle high register to 0x00   
     PSMC1DCL = 0x00;                    // * Set duty cycle low register to 0x00
@@ -317,10 +328,12 @@ void UART_send_u16(uint16_t number)
     while(0 == TXIF)
     {
     }/// * Hold the program until the transmission buffer is free
+   // num = hexToAscii((number >> 8) & 0xFF)
     TX1REG = (number >> 8) & 0xFF; /// * Load the transmission buffer with @p bt
     while(0 == TXIF)
     {
     }/// * Hold the program until the transmission buffer is free
+    //num0 = hexToAscii(number & 0x00FF)
     TX1REG = number & 0x00FF; /// * Load the transmission buffer with @p bt
 }
 
@@ -360,3 +373,5 @@ void PAO(uint16_t pv_voltage, uint16_t pv_current, uint32_t* previous_power, cha
     *previous_power = new_power;
     //06 increase 07 decrease 08 mantain
 }
+
+
