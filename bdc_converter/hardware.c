@@ -41,6 +41,13 @@ void initialize()
     TMR1CS1 = 0;    //FOSC/4
     T1CKPS0 = 1;
     T1CKPS1 = 1;    // 8 millisecond
+<<<<<<< Updated upstream
+=======
+    
+  //  TMR1H = 0xFF;   //TMR1 (Fosc/4)/8 = 1Mhz (Tosc= 1us)
+   // TMR1L = 0x9C;   //TMR1 counts:  (65536 - 65436) x 1us = 100us
+    
+>>>>>>> Stashed changes
     TMR1H = 0xE1;   //TMR1 Fosc/4= 8Mhz (Tosc= 0.125us)
     TMR1L = 0x83;   //TMR1 counts: 7805 x 0.125us = 0.97562ms
     /** @b PSMC/PWM @b SETTINGS*/
@@ -48,8 +55,18 @@ void initialize()
     PSMC1CON = 0x00; /// * Clear PSMC1 configuration to start
     PSMC1MDL = 0x00; /// * No modulation
     PSMC1CLK = 0x01; /// * Driven by 64MHz PLL system clock
+<<<<<<< Updated upstream
     PSMC1PRH = 0x01; /// * Set period high register to 0x01
     PSMC1PRL = 0xFF; /// * Set period low register to 0xFF
+=======
+    PSMC1PRH = 0x01; /// * Set period high register to 0x18
+    PSMC1PRL = 0xFF; /// * Set period low register to 0xFF
+    /** 6399 + 1 clock cycles for period that is 100us (10KHz)*/
+    /** This set the PWM with 9 bit of resolution*/
+    
+  //  PSMC1PRH = 0x01; /// * Set period high register to 0x01
+  //  PSMC1PRL = 0xFF; /// * Set period low register to 0xFF
+>>>>>>> Stashed changes
     /** 511 + 1 clock cycles for period that is 8us (125KHz)*/
     /** This set the PWM with 9 bit of resolution*/
     /** Duty cycle*/
@@ -123,7 +140,7 @@ void initialize()
 */
 void control_loop()
 {   
-    pid(vbus, vbusr, &intacum, &dc);  /// * The #pid() function is called with @p feedback = #v and @p setpoint = #vref
+    pid(vbus, vbusr, &intacum, &deracum, &dc);  /// * The #pid() function is called with @p feedback = #v and @p setpoint = #vref
     set_DC(&dc); /// The duty cycle is set by calling the #set_DC() function
 }
 
@@ -131,25 +148,30 @@ void control_loop()
 *  @param   feedback average of measured values for the control variable
 *  @param   setpoint desire controlled output for the variable
 */
-void pid(uint16_t feedback, uint16_t setpoint, int24_t* acum, uint16_t* duty_cycle)
+void pid(uint16_t feedback, uint16_t setpoint, int24_t* acum, int24_t* eacum, uint16_t* duty_cycle)
 { 
 int16_t     er = 0; /// * Define @p er for calculating the error
-int16_t     pi = 0; /// * Define @p pi for storing the PI compensator value
+int16_t     pid = 0; /// * Define @p pi for storing the PI compensator value
+int16_t     der = 0; /// * Define @p pi for storing the PI compensator value
 int16_t     prop = 0;
 int16_t     inte = 0;
     er = (int16_t) (feedback - setpoint); /// * Calculate the error by substract the @p feedback from the @p setpoint and store it in @p er
     if(er > ERR_MAX) er = ERR_MAX; /// * Make sure error is never above #ERR_MAX
     if(er < ERR_MIN) er = ERR_MIN; /// * Make sure error is never below #ERR_MIN
-    prop = er / KP; /// * Calculate #proportional component of compensator
-	*acum += (int24_t) (er); /// * Calculate #integral component of compensator
+    prop = er / KP;
+    /// * Calculate #proportional component of compensator
+    *acum += (int24_t) (er); /// * Calculate #integral component of compensator
     inte = (int16_t) (*acum /  ((int24_t) KI * COUNTER));
-    pi = prop + inte; /// * Sum them up and store in @p pi*/
-    if ((uint16_t)((int16_t)*duty_cycle + pi) >= DC_MAX){ /// * Make sure duty cycle is never above #DC_MAX
+    
+    *eacum += (int24_t) (er); /// * Calculate #derivative component of compensator
+    der = (int16_t) (*eacum /  ((int24_t) KD * COUNTER));
+    pid = prop + inte; /// * Sum them up and store in @p pi*/
+    if ((uint16_t)((int16_t)*duty_cycle + pid) >= DC_MAX){ /// * Make sure duty cycle is never above #DC_MAX
         *duty_cycle = DC_MAX;
-    }else if ((uint16_t)((int16_t)*duty_cycle + pi) <= DC_MIN){ /// * Make sure duty cycle is never below #DC_MIN
+    }else if ((uint16_t)((int16_t)*duty_cycle + pid) <= DC_MIN){ /// * Make sure duty cycle is never below #DC_MIN
         *duty_cycle = DC_MIN;
     }else{
-        *duty_cycle = (uint16_t)((int16_t)*duty_cycle + pi); /// * Store the new value of the duty cycle with operation @code dc = dc + pi @endcode
+        *duty_cycle = (uint16_t)((int16_t)*duty_cycle + pid); /// * Store the new value of the duty cycle with operation @code dc = dc + pi @endcode
     }   
 }
 

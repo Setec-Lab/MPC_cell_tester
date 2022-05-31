@@ -29,8 +29,8 @@ Dprime=1-D;
 
 %tcntrl=2*10^-6+2*10^-6; % Time taken to propagate the signal througt the ADC with 12 bits of resolution and FOSC/32 plus execution time by the CPU
 %Ts=8*10^-6; %Fs = 125kHz of PWM defined on the PIC to the gate driver
-tcntrl=46*10^-6;
-Ts=100*10^-6;
+tcntrl=8*10^-6;
+Ts=8*10^-6;
 
 Tdpwm=D*Ts;
 td=tcntrl+Tdpwm;

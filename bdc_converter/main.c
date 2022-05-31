@@ -83,7 +83,7 @@ void main(void)
             SECF = 0;
             log_control_hex();
             //if ((vbatav < vbatmax) && (vbusr > ivbusr)) vbusr -= 2;
-            if (vbatav < vbatmin)STOP_CONVERTER();
+        //    if (vbatav < vbatmin)STOP_CONVERTER();
         }
 	}
 }
@@ -98,6 +98,13 @@ void __interrupt() ISR(void)
     {
         TMR1H = 0xE1; //TMR1 Fosc/4= 8Mhz (Tosc= 0.125us)
         TMR1L = 0x83; //TMR1 counts: 7805 x 0.125us = 975.625us
+<<<<<<< Updated upstream
+=======
+        
+        //TMR1H = 0xFF;   //TMR1 (Fosc/4)/8 = 1Mhz (Tosc= 1us)
+        //TMR1L = 0x9C;   //TMR1 counts:  (65536 - 65436) x 1us = 100us
+        
+>>>>>>> Stashed changes
         TMR1IF = 0; //Clear timer1 interrupt flag
         vbus = read_ADC(VS_BUS); /// * Then, the ADC channels are read by calling the #read_ADC() function
         vbat = read_ADC(VS_BAT); /// * Then, the ADC channels are read by calling the #read_ADC() function
@@ -105,7 +112,7 @@ void __interrupt() ISR(void)
         //HERE 2154 is a hack to get 0 current
         ibat = 2048 - ibat; 
         if (conv){
-//            control_loop(); /// -# The #control_loop() function is called*/
+           control_loop(); /// -# The #control_loop() function is called*/
 //            //if ((vbat >= vbatmax) && (vbusr < voc)) vbusr +=1; ///NEEDS CORRECTION
             set_DC(&dc);
         }

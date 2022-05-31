@@ -50,8 +50,9 @@
 #define 	DC_MIN                  103 // DC = 0.2 MINIMUM
 #define 	DC_MAX                  461	// DC = 0.9 MAX
 #define     KP                      15 ///< Proportional constant divider 
-#define     KI                      35 ///< Integral constant divider 
-#define     VREF                    4800                  
+#define     KI                      1 ///< Integral constant divider 
+#define     KD                      77 ///< Derivative constant divider 
+#define     VREF                    4200               
 #define     sVREF                   (uint16_t) ( ( ( VREF * 4096.0 ) / 5935 ) + 0.5 )
 #define     CREF                    2000                  
 #define     sCREF                   (uint16_t) ( ( ( CREF * 4096.0 ) / (5000 * 2.5 * 5 ) ) + 0.5 )
@@ -73,6 +74,7 @@ uint8_t                             char_count = 0;
 char                                action = 0;
 char                                recep[2] = {0x00};
 int24_t                             intacum = 0;   ///< Integral acumulator of PI compensator
+int24_t                             deracum = 1;   ///< derivative acumulator of PD compensator
 uint16_t                            dc = DC_MAX;  ///< Duty cycle     
 bool                                log_on = 0; ///< Variable to indicate if the log is activated 
 int16_t                             second = -1; ///< Seconds counter, resetted after 59 seconds.
@@ -98,7 +100,7 @@ const uint16_t                      vbatmin = sVBATMIN;
 const uint16_t                      vbatmax = sVBATMAX;
         
 void initialize(void);
-void pid(uint16_t feedback, uint16_t setpoint, int24_t* acum, uint16_t* duty_cycle);
+void pid(uint16_t feedback, uint16_t setpoint, int24_t* acum, int24_t* eacum, uint16_t* duty_cycle);
 void set_DC(uint16_t* duty_cycle);
 uint16_t read_ADC(uint16_t channel);
 void log_control_hex(void);
