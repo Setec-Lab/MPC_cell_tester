@@ -41,13 +41,11 @@ void initialize()
     TMR1CS1 = 0;    //FOSC/4
     T1CKPS0 = 1;
     T1CKPS1 = 1;    // 8 millisecond
-<<<<<<< Updated upstream
-=======
     
   //  TMR1H = 0xFF;   //TMR1 (Fosc/4)/8 = 1Mhz (Tosc= 1us)
    // TMR1L = 0x9C;   //TMR1 counts:  (65536 - 65436) x 1us = 100us
     
->>>>>>> Stashed changes
+
     TMR1H = 0xE1;   //TMR1 Fosc/4= 8Mhz (Tosc= 0.125us)
     TMR1L = 0x83;   //TMR1 counts: 7805 x 0.125us = 0.97562ms
     /** @b PSMC/PWM @b SETTINGS*/
@@ -55,10 +53,10 @@ void initialize()
     PSMC1CON = 0x00; /// * Clear PSMC1 configuration to start
     PSMC1MDL = 0x00; /// * No modulation
     PSMC1CLK = 0x01; /// * Driven by 64MHz PLL system clock
-<<<<<<< Updated upstream
+
     PSMC1PRH = 0x01; /// * Set period high register to 0x01
     PSMC1PRL = 0xFF; /// * Set period low register to 0xFF
-=======
+
     PSMC1PRH = 0x01; /// * Set period high register to 0x18
     PSMC1PRL = 0xFF; /// * Set period low register to 0xFF
     /** 6399 + 1 clock cycles for period that is 100us (10KHz)*/
@@ -66,7 +64,7 @@ void initialize()
     
   //  PSMC1PRH = 0x01; /// * Set period high register to 0x01
   //  PSMC1PRL = 0xFF; /// * Set period low register to 0xFF
->>>>>>> Stashed changes
+
     /** 511 + 1 clock cycles for period that is 8us (125KHz)*/
     /** This set the PWM with 9 bit of resolution*/
     /** Duty cycle*/

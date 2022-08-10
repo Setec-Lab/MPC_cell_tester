@@ -98,13 +98,11 @@ void __interrupt() ISR(void)
     {
         TMR1H = 0xE1; //TMR1 Fosc/4= 8Mhz (Tosc= 0.125us)
         TMR1L = 0x83; //TMR1 counts: 7805 x 0.125us = 975.625us
-<<<<<<< Updated upstream
-=======
-        
+
         //TMR1H = 0xFF;   //TMR1 (Fosc/4)/8 = 1Mhz (Tosc= 1us)
         //TMR1L = 0x9C;   //TMR1 counts:  (65536 - 65436) x 1us = 100us
         
->>>>>>> Stashed changes
+
         TMR1IF = 0; //Clear timer1 interrupt flag
         vbus = read_ADC(VS_BUS); /// * Then, the ADC channels are read by calling the #read_ADC() function
         vbat = read_ADC(VS_BAT); /// * Then, the ADC channels are read by calling the #read_ADC() function
