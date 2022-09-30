@@ -20,7 +20,7 @@ s = tf('s');
 rC=20*10^-3;
 rL=560*10^-3;
 L=470*10^-6;
-C=440*10^-6;
+C=470*10^-6;
 
 Vg=24;
 Io=0.05;
@@ -102,12 +102,14 @@ z = tf('z',Ts);
 Gcz = Kp + Ki/(1-z^-1) + Kd*(1-z^-1);
 
 display(Gvuz)
+display(Gvuz2)
 display(Gcz)
 display(Kp)
 display(Ki)
 display(Kd)
 display(m)
 display(p0)
-bode(Gvuz)
+bode(Gvuz,Gvuz2)
+%bode(Gvuz2)
 %bode(Gvuz2,Gvuz,Gvds)
 

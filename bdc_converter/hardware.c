@@ -138,7 +138,14 @@ void initialize()
 */
 void control_loop()
 {   
-    pid(vbus, vbusr, &intacum, &deracum, &dc);  /// * The #pid() function is called with @p feedback = #v and @p setpoint = #vref
+    if (vbat>=vbusr){
+    pid(vbat, vbusr, &intacum, &deracum, &dc);  /// * The #pid() function is called with @p feedback = #v and @p setpoint = #vref
+        }else{
+            pi(ibat, iref, &intacum, &deracum, &dc);  /// * The #pid() function is called with @p feedback = #v and @p setpoint = #vref
+         } 
+    //pid(vbus, vbusr, &intacum, &deracum, &dc);  /// * The #pid() function is called with @p feedback = #v and @p setpoint = #vref
+    
+ //   pid_curr(vbus, vbusr, &intacum, &deracum, &dc);
     set_DC(&dc); /// The duty cycle is set by calling the #set_DC() function
 }
 
@@ -153,7 +160,7 @@ int16_t     pid = 0; /// * Define @p pi for storing the PI compensator value
 int16_t     der = 0; /// * Define @p pi for storing the PI compensator value
 int16_t     prop = 0;
 int16_t     inte = 0;
-    er = (int16_t) (feedback - setpoint); /// * Calculate the error by substract the @p feedback from the @p setpoint and store it in @p er
+    er = (int16_t) (setpoint - feedback ); /// * Calculate the error by substract the @p feedback from the @p setpoint and store it in @p er
     if(er > ERR_MAX) er = ERR_MAX; /// * Make sure error is never above #ERR_MAX
     if(er < ERR_MIN) er = ERR_MIN; /// * Make sure error is never below #ERR_MIN
     prop = er / KP;
@@ -170,6 +177,30 @@ int16_t     inte = 0;
         *duty_cycle = DC_MIN;
     }else{
         *duty_cycle = (uint16_t)((int16_t)*duty_cycle + pid); /// * Store the new value of the duty cycle with operation @code dc = dc + pi @endcode
+    }   
+}
+
+void pi(uint16_t feedback, uint16_t setpoint, int24_t* acum, int24_t* eacum, uint16_t* duty_cycle)
+{ 
+int16_t     er = 0; /// * Define @p er for calculating the error
+int16_t     pi = 0; /// * Define @p pi for storing the PI compensator value
+int16_t     prop = 0;
+int16_t     inte = 0;
+    er = (int16_t) (feedback - setpoint); /// * Calculate the error by substract the @p feedback from the @p setpoint and store it in @p er
+    if(er > ERR_MAX) er = ERR_MAX; /// * Make sure error is never above #ERR_MAX
+    if(er < ERR_MIN) er = ERR_MIN; /// * Make sure error is never below #ERR_MIN
+    prop = er / KP_i;
+    /// * Calculate #proportional component of compensator
+    *acum += (int24_t) (er); /// * Calculate #integral component of compensator
+    inte = (int16_t) (*acum /  ((int24_t) KI_i * COUNTER));
+    
+    pi = prop + inte; /// * Sum them up and store in @p pi*/
+    if ((uint16_t)((int16_t)*duty_cycle + pi) >= DC_MAX){ /// * Make sure duty cycle is never above #DC_MAX
+        *duty_cycle = DC_MAX;
+    }else if ((uint16_t)((int16_t)*duty_cycle + pi) <= DC_MIN){ /// * Make sure duty cycle is never below #DC_MIN
+        *duty_cycle = DC_MIN;
+    }else{
+        *duty_cycle = (uint16_t)((int16_t)*duty_cycle + pi); /// * Store the new value of the duty cycle with operation @code dc = dc + pi @endcode
     }   
 }
 

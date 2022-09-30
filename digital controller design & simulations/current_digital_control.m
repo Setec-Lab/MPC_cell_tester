@@ -15,17 +15,17 @@ s = tf('s');
 rC=20*10^-3;
 rL=560*10^-3;
 L=470*10^-6;
-C=440*10^-6;
+C=470*10^-6;
 
 Vg=3.8;
-Io=5;
+Io=1;
 D=0.5;
 Dprime=1-D;
 
 %tcntrl=2*10^-6+2*10^-6; % Time taken to propagate the signal througt the ADC with 12 bits of resolution and FOSC/32 plus execution time by the CPU
 %Ts=8*10^-6; %Fs = 125kHz of PWM defined on the PIC to the gate driver
-tcntrl=46*10^-6;
-Ts=100*10^-6;
+tcntrl=8*10^-6;
+Ts=8*10^-6;
 
 Tdpwm=D*Ts;
 td=tcntrl+Tdpwm;
@@ -57,10 +57,10 @@ sys2 = ss(Phi,gamma,delta(2,:),0,Ts);
 Gvuz = tf(sys2);
 
 %Obtención de la FT discretizada mediante el método de impulso 
-Gvds = Vg*(1+s*rC*C)/(1+s*(rL+rC)*C+s^2*L*C);
+Gids = Vg*(s*C)/(1+s*rC*C+s*C);
 %Xdown = ((eye(2)-exL+rC)*C+s^2*L*C);
-Gvds.outputdelay = td;
-Gvuz2 = (1/Nr)*c2d(Gvds,Ts,'imp');
+Gids.outputdelay = td;
+Giuz2 = (1/Nr)*c2d(Gids,Ts,'imp');
 
 
 % Target crossover frequency and phase margin
@@ -99,5 +99,7 @@ display(Kp)
 display(Ki)
 display(m)
 display(p0)
-%bode(Gvuz2,Gvuz,Gvds)
+bode(Giuz2,Giuz)
+%bode(p0)
+%bode(Giuz2,Giuz)
 
