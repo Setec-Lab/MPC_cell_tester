@@ -47,17 +47,20 @@
 #define 	_XTAL_FREQ 				32000000
 #define		ERR_MAX					500
 #define		ERR_MIN					-500
+#define		ERR_MAX_i			    50
+#define		ERR_MIN_i				-50
 #define 	DC_MIN                  103 // DC = 0.2 MINIMUM
 #define 	DC_MAX                  461	// DC = 0.9 MAX
-#define     KP                      19 ///< Proportional constant divider 15
+#define     KP                      39///< Proportional constant divider 15
 #define     KI                      1 ///< Integral constant divider   1
-#define     KD                      77 ///< Derivative constant divider  77
-#define     KP_i                     10 ///< Proportional constant divider 15
-#define     KI_i                     4 ///< Integral constant divider   1
+#define     KD                      129.0410 ///< Derivative constant divider  77
+#define     KP_i                    9///< Proportional constant divider 15
+#define     KI_i                    3///< Integral constant divider   1
 #define     VREF                    4200               
 #define     sVREF                   (uint16_t) ( ( ( VREF * 4096.0 ) / 5000 ) + 0.5 ) //5935
-#define     CREF                    500                  
-#define     sCREF                   (uint16_t) ( ( ( CREF * 4096.0 ) / (5000 * 2.5 * 5 ) ) + 0.5 )
+#define     CREF                    400                  
+//#define     sCREF                   (int16_t) ( ( ( CREF * 4096.0 ) / (5000 * 2.5 * 5 ) ) + 0.5 )
+#define     sCREF                   (int16_t) CREF 
 #define     VOC                     5400
 #define     sVOC                    (uint16_t) ( ( ( VOC * 4096.0 ) / 5935 ) + 0.5 )
 #define     VBATMIN                 2500
@@ -96,14 +99,15 @@ int16_t                             ibatav = 0;
 //uint16_t                            ocref = 2000;
 uint16_t                            vbusr = sVREF;    
 const uint16_t                      ivbusr = sVREF; 
-const uint16_t                      iref = sCREF;
+const int16_t                      iref = sCREF;
 const uint16_t                      voc = sVOC;
 const uint16_t                      vbatmin = sVBATMIN;
 const uint16_t                      vbatmax = sVBATMAX;
+int16_t     ibat0 = 0;
         
 void initialize(void);
 void pid(uint16_t feedback, uint16_t setpoint, int24_t* acum, int24_t* eacum, uint16_t* duty_cycle);
-void pi(uint16_t feedback, uint16_t setpoint, int24_t* acum, int24_t* eacum, uint16_t* duty_cycle);
+void pi(uint16_t feedback, uint16_t setpoint, int24_t* acum, uint16_t* duty_cycle);
 void set_DC(uint16_t* duty_cycle);
 uint16_t read_ADC(uint16_t channel);
 void log_control_hex(void);
@@ -116,6 +120,7 @@ void UART_send_char(char bt);
 char UART_get_char(void); 
 void UART_send_string(const char* st_pt);
 void UART_send_u16(uint16_t number); 
+void UART_send_i16(int16_t number); 
 void timing(void);
 void PAO(uint16_t pv_voltage, uint16_t pv_current, uint32_t* previous_power, char* previous_direction);
 

@@ -138,12 +138,18 @@ void initialize()
 */
 void control_loop()
 {   
-    if (vbat>=vbusr){
+
+   if (vbat>=vbusr){
     pid(vbat, vbusr, &intacum, &deracum, &dc);  /// * The #pid() function is called with @p feedback = #v and @p setpoint = #vref
         }else{
-            pi(ibat, iref, &intacum, &deracum, &dc);  /// * The #pid() function is called with @p feedback = #v and @p setpoint = #vref
+       ibat=65535-ibat-23;
+       ibat0=ibat;
+            pi(ibat, iref, &intacum, &dc);
+      ibat=ibat+65535+23;
+      
+            /// * The #pid() function is called with @p feedback = #v and @p setpoint = #vref
          } 
-    //pid(vbus, vbusr, &intacum, &deracum, &dc);  /// * The #pid() function is called with @p feedback = #v and @p setpoint = #vref
+   // pid(vbus, vbusr, &intacum, &deracum, &dc);  /// * The #pid() function is called with @p feedback = #v and @p setpoint = #vref
     
  //   pid_curr(vbus, vbusr, &intacum, &deracum, &dc);
     set_DC(&dc); /// The duty cycle is set by calling the #set_DC() function
@@ -156,52 +162,52 @@ void control_loop()
 void pid(uint16_t feedback, uint16_t setpoint, int24_t* acum, int24_t* eacum, uint16_t* duty_cycle)
 { 
 int16_t     er = 0; /// * Define @p er for calculating the error
-int16_t     pid = 0; /// * Define @p pi for storing the PI compensator value
-int16_t     der = 0; /// * Define @p pi for storing the PI compensator value
-int16_t     prop = 0;
-int16_t     inte = 0;
-    er = (int16_t) (setpoint - feedback ); /// * Calculate the error by substract the @p feedback from the @p setpoint and store it in @p er
+float     pid = 0; /// * Define @p pi for storing the PI compensator value
+float     der = 0; /// * Define @p pi for storing the PI compensator value
+float    prop = 0;
+float     inte = 0;
+    er = (setpoint - feedback ); /// * Calculate the error by substract the @p feedback from the @p setpoint and store it in @p er
     if(er > ERR_MAX) er = ERR_MAX; /// * Make sure error is never above #ERR_MAX
     if(er < ERR_MIN) er = ERR_MIN; /// * Make sure error is never below #ERR_MIN
     prop = er / KP;
     /// * Calculate #proportional component of compensator
-    *acum += (int24_t) (er); /// * Calculate #integral component of compensator
-    inte = (int16_t) (*acum /  ((int24_t) KI * COUNTER));
+    *acum += (er); /// * Calculate #integral component of compensator
+    inte = (*acum /  ( KI * COUNTER));
     
-    *eacum += (int24_t) (er); /// * Calculate #derivative component of compensator
-    der = (int16_t) (*eacum /  ((int24_t) KD * COUNTER));
-    pid = prop + inte; /// * Sum them up and store in @p pi*/
-    if ((uint16_t)((int16_t)*duty_cycle + pid) >= DC_MAX){ /// * Make sure duty cycle is never above #DC_MAX
+    *eacum +=  (er); /// * Calculate #derivative component of compensator
+    der =  (*eacum /  (KD * COUNTER));
+    pid = (prop + inte )*0.512; /// * Sum them up and store in @p pid*/
+    if ((uint16_t)(*duty_cycle + pid) >= DC_MAX){ /// * Make sure duty cycle is never above #DC_MAX
         *duty_cycle = DC_MAX;
-    }else if ((uint16_t)((int16_t)*duty_cycle + pid) <= DC_MIN){ /// * Make sure duty cycle is never below #DC_MIN
+    }else if ((uint16_t)(*duty_cycle + pid) <= DC_MIN){ /// * Make sure duty cycle is never below #DC_MIN
         *duty_cycle = DC_MIN;
     }else{
-        *duty_cycle = (uint16_t)((int16_t)*duty_cycle + pid); /// * Store the new value of the duty cycle with operation @code dc = dc + pi @endcode
+        *duty_cycle = (uint16_t)(*duty_cycle + pid); /// * Store the new value of the duty cycle with operation @code dc = dc + pi @endcode
     }   
 }
 
-void pi(uint16_t feedback, uint16_t setpoint, int24_t* acum, int24_t* eacum, uint16_t* duty_cycle)
+void pi(uint16_t feedback, uint16_t setpoint, int24_t* acum, uint16_t* duty_cycle)
 { 
 int16_t     er = 0; /// * Define @p er for calculating the error
-int16_t     pi = 0; /// * Define @p pi for storing the PI compensator value
-int16_t     prop = 0;
-int16_t     inte = 0;
-    er = (int16_t) (feedback - setpoint); /// * Calculate the error by substract the @p feedback from the @p setpoint and store it in @p er
-    if(er > ERR_MAX) er = ERR_MAX; /// * Make sure error is never above #ERR_MAX
-    if(er < ERR_MIN) er = ERR_MIN; /// * Make sure error is never below #ERR_MIN
-    prop = er / KP_i;
+float     pi = 0; /// * Define @p pi for storing the PI compensator value
+float     prop = 0;
+float     inte = 0;
+    er = (setpoint - feedback ); /// * Calculate the error by substract the @p feedback from the @p setpoint and store it in @p er
+    if(er > ERR_MAX_i) er = ERR_MAX_i; /// * Make sure error is never above #ERR_MAX
+    if(er < ERR_MIN_i) er = ERR_MIN_i; /// * Make sure error is never below #ERR_MIN
+    prop = er / KP;
     /// * Calculate #proportional component of compensator
-    *acum += (int24_t) (er); /// * Calculate #integral component of compensator
-    inte = (int16_t) (*acum /  ((int24_t) KI_i * COUNTER));
+    *acum += (er); /// * Calculate #integral component of compensator
+    inte = (*acum /  (KI * COUNTER));
     
-    pi = prop + inte; /// * Sum them up and store in @p pi*/
-    if ((uint16_t)((int16_t)*duty_cycle + pi) >= DC_MAX){ /// * Make sure duty cycle is never above #DC_MAX
+    pi = (prop + inte)*0.512; /// * Sum them up and store in @p pi*/
+    if ((uint16_t)(*duty_cycle + pi) >= DC_MAX){ /// * Make sure duty cycle is never above #DC_MAX
         *duty_cycle = DC_MAX;
-    }else if ((uint16_t)((int16_t)*duty_cycle + pi) <= DC_MIN){ /// * Make sure duty cycle is never below #DC_MIN
+    }else if ((uint16_t)(*duty_cycle + pi) <= DC_MIN){ /// * Make sure duty cycle is never below #DC_MIN
         *duty_cycle = DC_MIN;
     }else{
-        *duty_cycle = (uint16_t)((int16_t)*duty_cycle + pi); /// * Store the new value of the duty cycle with operation @code dc = dc + pi @endcode
-    }   
+        *duty_cycle = (uint16_t)(*duty_cycle + pi); /// * Store the new value of the duty cycle with operation @code dc = dc + pi @endcode
+     }   
 }
 
 /**@brief This function sets the desired duty cycle
@@ -224,18 +230,32 @@ This problem can be avoided with the use of interruptions for the control loop; 
 and could be considered as some future improvement IT IS IMPLEMENTED NOW*/  
 vbusav = (uint16_t) ( ( ( vbusav * 5935.0 ) / 4096 ) + 0.5 );
 vbatav = (uint16_t) ( ( ( vbatav * 5000.0 ) / 4096 ) + 0.5 );
-ibatav = (int16_t) ( ( ( ibatav * 2.5 * 5000 ) / 4096 ) + 0.5 ); 
+ibatav = (int16_t)  ibatav ; 
 //if ( ibatav > 0 ) capap += (uint16_t) ( ibatav / 360 ) + 0.5; /// * Divide #iprom between 3600 and multiplied by 10 add it to #qprom to integrate the current over time
     
     if (log_on)
     {
                 HEADER;
+         //       display_value_u(minute);
+           //     display_value_u((uint16_t)second);
+              //  display_value_u(vbusav);
+              //  display_value_u("\n");
+            //   display_value_u(vbatav);
+              //  display_value_u("\n");
+            //    display_value_u(65535-ibatav-50);
                 UART_send_u16(minute);
                 UART_send_u16((uint16_t)second);
                 UART_send_u16(vbusav);
                 UART_send_u16(vbatav);
-                UART_send_u16(ibatav);
+              //  UART_send_u16(vbusr);
+                UART_send_i16(ibatav);
+                UART_send_u16(dc);
+              //  UART_send_i16(iref);
+             //   UART_send_u16(duty_cycle);
+ 
                 FOOTER;
+       
+
     }
     if (!log_on) RESET_TIME(); /// If #log_on is cleared, call #RESET_TIME()
 }
@@ -289,7 +309,7 @@ void calculate_avg()
         default: /// If #count is not any of the previous cases then
             vbusac += (uint24_t) vbus; /// * Accumulate #vbus in #vbusac
             vbatac += (uint24_t) vbat; /// * Accumulate #vbat in #vbatac
-            ibatac += (uint24_t) ibat; /// * Accumulate #ibat in #ibatac
+            ibatac += (uint24_t) ibat0; /// * Accumulate #ibat in #ibatac
     }  
 }
 
@@ -375,17 +395,17 @@ void UART_send_u16(uint16_t number)
     TX1REG = number & 0x00FF; /// * Load the transmission buffer with @p bt
 }
 
-//void UART_send_i16(int16_t number)  
-//{
-//    while(0 == TXIF)
-//    {
-//    }/// * Hold the program until the transmission buffer is free
-//    TX1REG = (number >> 8) & 0xFF; /// * Load the transmission buffer with @p bt
-//    while(0 == TXIF)
-//    {
-//    }/// * Hold the program until the transmission buffer is free
-//    TX1REG = number & 0x00FF; /// * Load the transmission buffer with @p bt
-//}
+void UART_send_i16(int16_t number)  
+{
+    while(0 == TXIF)
+    {
+    }/// * Hold the program until the transmission buffer is free
+    TX1REG = (number >> 8) & 0xFF; /// * Load the transmission buffer with @p bt
+    while(0 == TXIF)
+    {
+    }/// * Hold the program until the transmission buffer is free
+    TX1REG = number & 0x00FF; /// * Load the transmission buffer with @p bt
+}
 /**@brief This function calculate the averages
 */
 void PAO(uint16_t pv_voltage, uint16_t pv_current, uint32_t* previous_power, char* previous_direction)

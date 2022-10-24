@@ -18,11 +18,11 @@ s = tf('s');
 %C=34*10^-6;
 
 rC=20*10^-3;
-rL=560*10^-3;
+rL=91.8*10^-3;
 L=470*10^-6;
 C=470*10^-6;
 
-Vg=24;
+Vg=12;
 Io=0.05;
 D=0.5;
 Dprime=1-D;
@@ -69,8 +69,8 @@ Gvuz2 = (1/Nr)*c2d(Gvds,Ts,'imp');
 
 
 % Target crossover frequency and phase margin
-wc = 2*pi*(fs/10);
-mphi = (pi/180)*45; % 45deg to radians
+wc = 2*pi*(fs/14);
+mphi = (pi/180)*69; % 45deg to radians
 
 % Magnitude and phase of Tuz at the target crossover frequency
 %[m,p] = bode(Tuz,wc);
@@ -101,6 +101,8 @@ Kd = GPIinf*GPD0/2*(1-wPI/wp)*(wp/wPD-1);
 z = tf('z',Ts);
 Gcz = Kp + Ki/(1-z^-1) + Kd*(1-z^-1);
 
+GvuzGcvz=Gvuz*Gcz;
+
 display(Gvuz)
 display(Gvuz2)
 display(Gcz)
@@ -109,7 +111,7 @@ display(Ki)
 display(Kd)
 display(m)
 display(p0)
-bode(Gvuz,Gvuz2)
+bode(Gvuz)
 %bode(Gvuz2)
 %bode(Gvuz2,Gvuz,Gvds)
 
