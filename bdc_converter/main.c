@@ -1,12 +1,13 @@
 /**
  * @file main.c
- * @author Juan J. Rojas
- * @date 10 Nov 2018
- * @brief main loop for the BDC prototype converter.
- * @par Institution:
- * LaSEINE / CeNT. Kyushu Institute of Technology.
- * @par Mail (after leaving Kyutech):
+  * @authors Juan J. Rojas /Kevin Gómez Villagra
+ * @date 10 Nov 2022
+ * @brief main loop for the MPC Celltester V1.0.
+ * @par Institutions:
+ * LaSEINE / CeNT. Kyushu Institute of Technology / Costa Rica Institute of technology.
+ * @par Mails :
  * juan.rojas@tec.ac.cr
+ * kevinxnor1419@estudiantec.cr
  * @par Git repository:
  * https://bitbucket.org/juanjorojash/bdc_prototype/src/master
  */

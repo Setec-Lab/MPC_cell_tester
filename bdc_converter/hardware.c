@@ -1,12 +1,13 @@
 /**
  * @file harware.c
- * @author Juan J. Rojas
- * @date 10 Nov 2018
- * @brief function definitions for the BDC prototype converter.
- * @par Institution:
- * LaSEINE / CeNT. Kyushu Institute of Technology.
- * @par Mail (after leaving Kyutech):
+ * @authors Juan J. Rojas /Kevin Gómez Villagra
+ * @date 10 Nov 2022
+ * @brief function definitions for the MCU_S1 converter.
+ * @par Institutions:
+ * LaSEINE / CeNT. Kyushu Institute of Technology / Costa Rica Institute of technology.
+ * @par Mails :
  * juan.rojas@tec.ac.cr
+ * kevinxnor1419@estudiantec.cr
  * @par Git repository:
  * https://bitbucket.org/juanjorojash/bdc_prototype/src/master
  */
@@ -140,18 +141,27 @@ void control_loop()
 {   
 
    if (vbat>=vbusr){
+       
     pid(vbat, vbusr, &intacum, &deracum, &dc);  /// * The #pid() function is called with @p feedback = #v and @p setpoint = #vref
         }else{
-       ibat=65535-ibat-23;
+       ibat=65535-ibat+550;
        ibat0=ibat;
+     //  ibat=ibat+140;
             pi(ibat, iref, &intacum, &dc);
-      ibat=ibat+65535+23;
+       //     ibat=ibat-140;
+      ibat=ibat+65535-550;
       
             /// * The #pid() function is called with @p feedback = #v and @p setpoint = #vref
          } 
    // pid(vbus, vbusr, &intacum, &deracum, &dc);  /// * The #pid() function is called with @p feedback = #v and @p setpoint = #vref
     
  //   pid_curr(vbus, vbusr, &intacum, &deracum, &dc);
+    set_DC(&dc); /// The duty cycle is set by calling the #set_DC() function
+}
+
+void control_loop_D()
+{   
+    pi(ibat, iref, &intacum, &dc);
     set_DC(&dc); /// The duty cycle is set by calling the #set_DC() function
 }
 
@@ -176,7 +186,7 @@ float     inte = 0;
     
     *eacum +=  (er); /// * Calculate #derivative component of compensator
     der =  (*eacum /  (KD * COUNTER));
-    pid = (prop + inte )*0.512; /// * Sum them up and store in @p pid*/
+    pid = (prop + inte +der)*0.512; /// * Sum them up and store in @p pid*/
     if ((uint16_t)(*duty_cycle + pid) >= DC_MAX){ /// * Make sure duty cycle is never above #DC_MAX
         *duty_cycle = DC_MAX;
     }else if ((uint16_t)(*duty_cycle + pid) <= DC_MIN){ /// * Make sure duty cycle is never below #DC_MIN
@@ -298,7 +308,7 @@ void calculate_avg()
         case COUNTER + 1: /// If #count = #COUNTER
             vbusac = (uint24_t) vbus;
             vbatac = (uint24_t) vbat;
-            ibatac = (uint24_t) ibat;
+            ibatac = (uint24_t) ibat0;
             break;
         case 0: /// If #count = 0
             vbusav = ((vbusac >> 7) + ((vbusac >> 6) & 0x01)); /// * This is equivalent to vbusac / 1024 = vbusac / 2^10      
@@ -310,6 +320,7 @@ void calculate_avg()
             vbusac += (uint24_t) vbus; /// * Accumulate #vbus in #vbusac
             vbatac += (uint24_t) vbat; /// * Accumulate #vbat in #vbatac
             ibatac += (uint24_t) ibat0; /// * Accumulate #ibat in #ibatac
+           // ibatac += (uint24_t) ibat; /// * Accumulate #ibat in #ibatac
     }  
 }
 

@@ -1,12 +1,13 @@
 /**
  * @file hardware.h
- * @author Juan J. Rojas
- * @date 10 Nov 2018
- * @brief Definitions for the BDC prototype controller
- * @par Institution:
- * LaSEINE / CeNT. Kyushu Institute of Technology.
- * @par Mail (after leaving Kyutech):
+ * @authors Juan J. Rojas /Kevin Gómez Villagra
+ * @date 10 Nov 2022
+ * @brief Definitions for the MCU_M controller
+ * @par Institutions:
+ * LaSEINE / CeNT. Kyushu Institute of Technology / Costa Rica Institute of technology.
+ * @par Mails :
  * juan.rojas@tec.ac.cr
+ * kevinxnor1419@estudiantec.cr
  * @par Git repository:
  * https://bitbucket.org/juanjorojash/bdc_prototype/src/master
  */
@@ -58,7 +59,7 @@
 #define     KI_i                    3///< Integral constant divider   1
 #define     VREF                    4200               
 #define     sVREF                   (uint16_t) ( ( ( VREF * 4096.0 ) / 5000 ) + 0.5 ) //5935
-#define     CREF                    400                  
+#define     CREF                    800                  
 //#define     sCREF                   (int16_t) ( ( ( CREF * 4096.0 ) / (5000 * 2.5 * 5 ) ) + 0.5 )
 #define     sCREF                   (int16_t) CREF 
 #define     VOC                     5400
@@ -80,6 +81,7 @@ char                                action = 0;
 char                                recep[2] = {0x00};
 int24_t                             intacum = 0;   ///< Integral acumulator of PI compensator
 int24_t                             deracum = 1;   ///< derivative acumulator of PD compensator
+int24_t                             intacumi = 0;   ///< Integral acumulator of PI compensator for current
 uint16_t                            dc = DC_MAX;  ///< Duty cycle     
 bool                                log_on = 0; ///< Variable to indicate if the log is activated 
 int16_t                             second = -1; ///< Seconds counter, resetted after 59 seconds.
@@ -106,7 +108,7 @@ const uint16_t                      vbatmax = sVBATMAX;
 int16_t     ibat0 = 0;
         
 void initialize(void);
-void pid(uint16_t feedback, uint16_t setpoint, int24_t* acum, int24_t* eacum, uint16_t* duty_cycle);
+void pid(uint16_t feedback, uint16_t setpoint, int24_t* acumi, int24_t* eacum, uint16_t* duty_cycle);
 void pi(uint16_t feedback, uint16_t setpoint, int24_t* acum, uint16_t* duty_cycle);
 void set_DC(uint16_t* duty_cycle);
 uint16_t read_ADC(uint16_t channel);
@@ -114,6 +116,7 @@ void log_control_hex(void);
 void display_value_u(uint16_t value);
 void display_value_s(int16_t value);
 void control_loop(void);
+void control_loop_D(void);
 void calculate_avg(void);
 void interrupt_enable(void);
 void UART_send_char(char bt);
