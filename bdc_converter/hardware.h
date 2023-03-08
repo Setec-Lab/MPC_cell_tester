@@ -1,12 +1,13 @@
 /**
  * @file hardware.h
- * @author Juan J. Rojas
- * @date 10 Nov 2018
- * @brief Definitions for the BDC prototype controller
- * @par Institution:
- * LaSEINE / CeNT. Kyushu Institute of Technology.
- * @par Mail (after leaving Kyutech):
+ * @authors Juan J. Rojas /Kevin Gómez Villagra
+ * @date 10 Nov 2022
+ * @brief Definitions for the MCU_M controller
+ * @par Institutions:
+ * LaSEINE / CeNT. Kyushu Institute of Technology / Costa Rica Institute of technology.
+ * @par Mails :
  * juan.rojas@tec.ac.cr
+ * kevinxnor1419@estudiantec.cr
  * @par Git repository:
  * https://bitbucket.org/juanjorojash/bdc_prototype/src/master
  */
@@ -45,21 +46,27 @@
     #include <stdbool.h> // Include bool type
 
 #define 	_XTAL_FREQ 				32000000
-#define		ERR_MAX					1000
-#define		ERR_MIN					-1000
+#define		ERR_MAX					500
+#define		ERR_MIN					-500
+#define		ERR_MAX_i			    50
+#define		ERR_MIN_i				-50
 #define 	DC_MIN                  103 // DC = 0.2 MINIMUM
 #define 	DC_MAX                  461	// DC = 0.9 MAX
-#define     KP                      15 ///< Proportional constant divider 
-#define     KI                      35 ///< Integral constant divider 
-#define     VREF                    4800                  
-#define     sVREF                   (uint16_t) ( ( ( VREF * 4096.0 ) / 5935 ) + 0.5 )
-#define     CREF                    2000                  
-#define     sCREF                   (uint16_t) ( ( ( CREF * 4096.0 ) / (5000 * 2.5 * 5 ) ) + 0.5 )
+#define     KP                      39///< Proportional constant divider 15
+#define     KI                      1 ///< Integral constant divider   1
+#define     KD                      129.0410 ///< Derivative constant divider  77
+#define     KP_i                    9///< Proportional constant divider 15
+#define     KI_i                    3///< Integral constant divider   1
+#define     VREF                    4200               
+#define     sVREF                   (uint16_t) ( ( ( VREF * 4096.0 ) / 5000 ) + 0.5 ) //5935
+#define     CREF                    800                  
+//#define     sCREF                   (int16_t) ( ( ( CREF * 4096.0 ) / (5000 * 2.5 * 5 ) ) + 0.5 )
+#define     sCREF                   (int16_t) CREF 
 #define     VOC                     5400
 #define     sVOC                    (uint16_t) ( ( ( VOC * 4096.0 ) / 5935 ) + 0.5 )
 #define     VBATMIN                 2500
 #define     sVBATMIN                (uint16_t) ( ( ( VBATMIN * 4096.0 ) / 5000 ) + 0.5 )
-#define     VBATMAX                 4150
+#define     VBATMAX                 4550
 #define     sVBATMAX                (uint16_t) ( ( ( VBATMAX * 4096.0 ) / 5000 ) + 0.5 )
 #define     COUNTER                 128
 #define		VS_BUS                  0b00010 //AN2 (RA2) 
@@ -73,6 +80,8 @@ uint8_t                             char_count = 0;
 char                                action = 0;
 char                                recep[2] = {0x00};
 int24_t                             intacum = 0;   ///< Integral acumulator of PI compensator
+int24_t                             deracum = 1;   ///< derivative acumulator of PD compensator
+int24_t                             intacumi = 0;   ///< Integral acumulator of PI compensator for current
 uint16_t                            dc = DC_MAX;  ///< Duty cycle     
 bool                                log_on = 0; ///< Variable to indicate if the log is activated 
 int16_t                             second = -1; ///< Seconds counter, resetted after 59 seconds.
@@ -92,25 +101,29 @@ int16_t                             ibatav = 0;
 //uint16_t                            ocref = 2000;
 uint16_t                            vbusr = sVREF;    
 const uint16_t                      ivbusr = sVREF; 
-//const uint16_t                      iref = sCREF;
+const int16_t                      iref = sCREF;
 const uint16_t                      voc = sVOC;
 const uint16_t                      vbatmin = sVBATMIN;
 const uint16_t                      vbatmax = sVBATMAX;
+int16_t     ibat0 = 0;
         
 void initialize(void);
-void pid(uint16_t feedback, uint16_t setpoint, int24_t* acum, uint16_t* duty_cycle);
+void pid(uint16_t feedback, uint16_t setpoint, int24_t* acumi, int24_t* eacum, uint16_t* duty_cycle);
+void pi(uint16_t feedback, uint16_t setpoint, int24_t* acum, uint16_t* duty_cycle);
 void set_DC(uint16_t* duty_cycle);
 uint16_t read_ADC(uint16_t channel);
 void log_control_hex(void);
 void display_value_u(uint16_t value);
 void display_value_s(int16_t value);
 void control_loop(void);
+void control_loop_D(void);
 void calculate_avg(void);
 void interrupt_enable(void);
 void UART_send_char(char bt);
 char UART_get_char(void); 
 void UART_send_string(const char* st_pt);
 void UART_send_u16(uint16_t number); 
+void UART_send_i16(int16_t number); 
 void timing(void);
 void PAO(uint16_t pv_voltage, uint16_t pv_current, uint32_t* previous_power, char* previous_direction);
 

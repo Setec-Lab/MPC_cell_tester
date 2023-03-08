@@ -13,19 +13,19 @@ s = tf('s');
 
 %variables
 rC=20*10^-3;
-rL=560*10^-3;
+rL=91.8*10^-3;
 L=470*10^-6;
-C=440*10^-6;
+C=470*10^-6;
 
-Vg=3.8;
-Io=5;
+Vg=12;
+Io=0.5;
 D=0.5;
 Dprime=1-D;
 
 %tcntrl=2*10^-6+2*10^-6; % Time taken to propagate the signal througt the ADC with 12 bits of resolution and FOSC/32 plus execution time by the CPU
 %Ts=8*10^-6; %Fs = 125kHz of PWM defined on the PIC to the gate driver
-tcntrl=46*10^-6;
-Ts=100*10^-6;
+tcntrl=8*10^-6;
+Ts=8*10^-6;
 
 Tdpwm=D*Ts;
 td=tcntrl+Tdpwm;
@@ -57,15 +57,15 @@ sys2 = ss(Phi,gamma,delta(2,:),0,Ts);
 Gvuz = tf(sys2);
 
 %Obtención de la FT discretizada mediante el método de impulso 
-Gvds = Vg*(1+s*rC*C)/(1+s*(rL+rC)*C+s^2*L*C);
+Gids = Vg*(s*C)/(1+s*rC*C+s*C);
 %Xdown = ((eye(2)-exL+rC)*C+s^2*L*C);
-Gvds.outputdelay = td;
-Gvuz2 = (1/Nr)*c2d(Gvds,Ts,'imp');
+Gids.outputdelay = td;
+Giuz2 = (1/Nr)*c2d(Gids,Ts,'imp');
 
 
 % Target crossover frequency and phase margin
-wc = 2*pi*(fs/10);
-mphi = (pi/180)*77; % 45deg to radians
+wc = 2*pi*(fs/18);
+mphi = (pi/180)*80; % 45deg to radians
 
 % Magnitude and phase of Tuz at the target crossover frequency
 [m,p0] = bode(Giuz,wc);
@@ -81,7 +81,7 @@ wp = 2*pi*fs/pi;
 pw = atan(wcp/wp);
 
 % PI zero and high-frequency gain
-wPI = wcp*tan(87.04-77);
+wPI = wcp*tan(80.2629-80);
 GPIinf = (1/m)*(1/sqrt(1+(wPI/wcp)^2));
 
 % Proportional, Integral and Derivative Gains
@@ -93,11 +93,15 @@ Ki = 2*GPIinf*wPI/wp;
 z = tf('z',Ts);
 Gcz = Kp + Ki/(1-z^-1);
 
+GiuzGciz=Giuz*Gcz;
+
 display(Giuz)
 display(Gcz)
 display(Kp)
 display(Ki)
 display(m)
 display(p0)
-%bode(Gvuz2,Gvuz,Gvds)
+bode(GiuzGciz)
+%bode(p0)
+%bode(Giuz2,Giuz)
 
