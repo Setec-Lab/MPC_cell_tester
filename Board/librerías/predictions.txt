@@ -1,0 +1,122 @@
+@ Report : predictions
+
+
+####################
+@ FilterSet : predictions_FilterSet
+####################
+
+@ Domain : MIDAS
+@ Attributes : 
+	@@ Operation :
+		 = 6212, = 
+	;
+	@@ ProgramName :
+		 = SPR*
+	;
+	@@ SubstructureId :
+		 = U2
+		 = U3
+		 = U4
+		 = U1
+	;
+	@@ Lot :
+		 = J207132CR
+		 = J207133CR
+		 = J207091DPM
+		 = J208054DPM
+		 = J208082CR
+		 = J209210MV
+		 = J210001DPM
+		 = J210006DPM
+		 = J210007DPM
+		 = J210121MV
+		 = J210010DPM
+		 = J211010DPM
+		 = J211062DPM
+		 = J211064DPM
+		 = J212019DPM
+		 = J212109DPM
+		 = J213001EV
+		 = J213016EV
+		 = J213039EV
+		 = J213176MV
+		 = J2130320
+	;
+
+####################
+@ Parameters : predictions_Parameters
+####################
+
+@ Operations : 
+
+	@@ 6261| : Data Domain = CLASS; Show Latest = Yes; Lots From Filterset = Yes; 
+
+	@@ 6212| : Data Domain = CLASS; Show Latest = Yes; Lots From Filterset = Yes; 
+
+	@@ 119325| : Data Domain = SORT; Show Latest = Yes; Lots From Filterset = Yes; 
+
+@ Parameters Group : Session Data
+	@@ "0|LOTS Temperature" : Operations = 6212; 
+	@@ "1|Facility" : Operations = 6212; 
+	@@ "2|Program Name" : Operations = 6212; 
+	@@ "3|Lot" : Operations = 6212; 
+	@@ "4|Unit TIU" : Operations = 6212; 
+	@@ "5|DevRevStep" : Operations = 6212; 
+	@@ "6|Unit Tester Id" : Operations = 6212; 
+	@@ "7|TIU Personality Card ID" : Operations = 6212; 
+	@@ "8|Testing Session Latest Flag" : Operations = 6212; 
+	@@ "9|LATO Start WW" : Operations = 6212; 
+	@@ "10|Thermal Head Id" : Operations = 6212; 
+	@@ "11|Unit Tester Site Id" : Operations = 6212; 
+
+@ Parameters Group : Bin
+	@@ "0|FUNCTIONAL_BIN" : Operations = 6212; 
+	@@ "1|INTERFACE_BIN" : Operations = 6212; 
+
+@ Parameters Group : Raw Data
+	@@ "0|VIS_ID" : Retest Format = HEX; Operations = 6212; 
+	@@ "1|FUS_PREREAD::FUSE_X_FUSEREAD_K_START_X_X_X_X_MAIN_FUSE_READ_CPU0" : Retest Format = HEX; Operations = 6212; 
+	@@ "2|FUS_PREREAD::FUSE_X_FUSEREAD_K_START_X_X_X_X_MAIN_FUSE_READ_CPU1" : Retest Format = HEX; Operations = 6212; 
+	@@ "3|FUS_PREREAD::FUSE_X_FUSEREAD_K_START_X_X_X_X_MAIN_FUSE_READ_CPU2" : Retest Format = HEX; Operations = 6212; 
+	@@ "4|FUS_PREREAD::FUSE_X_FUSEREAD_K_START_X_X_X_X_MAIN_FUSE_READ_CPU3" : Retest Format = HEX; Operations = 6212; 
+
+@ Parameters Group : String
+	@@ "0|SIO_PI5*SQLCHEXIT*" : Operations = 6212; 
+	@@ "1|SIO_PI5*LPBK*" : Operations = 6212; 
+	@@ "2|SIO_PI5*CTRL*" : Operations = 6212; 
+	@@ "3|SIO_PI5*TXRXDET*" : Operations = 6212; 
+	@@ "4|SIO_PI5*DCBIAS*" : Operations = 6212; 
+	@@ "5|SIO_PI5*NTL*" : Operations = 6212; 
+	@@ "6|SIO_PI5*TRIM*" : Operations = 6212; 
+	@@ "7|SIO_UPI*VIADELAM*" : Operations = 6212; 
+	@@ "8|SIO_UPI*TRIM*" : Operations = 6212; 
+	@@ "9|SIO_UPI*NTL*" : Operations = 6212; 
+	@@ "10|SIO_UPI*DCBIAS*" : Operations = 6212; 
+	@@ "11|SIO_UPI*TXRXDET*" : Operations = 6212; 
+	@@ "12|SIO_UPI*CTRL*" : Operations = 6212; 
+	@@ "13|SIO_UPI*LPBK*" : Operations = 6212; 
+	@@ "14|SIO_UPI*SQLCHEXIT*" : Operations = 6212; 
+	@@ "15|SIO_PI5*TXEQSWEEP*" : Operations = 6212; 
+	@@ "16|SIO_UPI*TXEQSWEEP*" : Operations = 6212; 
+	@@ "17|SIO_UPI*APROBE*EDC*" : Operations = 6212; 
+	@@ "18|SIO_PI5*APROBE*EDC*" : Operations = 6212; 
+
+@ Parameters Group : Parametric
+	@@ "0|IDV_2117_NOMNLK12_FULLDIE_0950_TALL_MED" : Operations = 6212; 
+	@@ "1|IDV_2119_NOMPLK12_FULLDIE_0950_TALL_MED" : Operations = 6212; 
+	@@ "2|PTH_POWER*POWER_X_ANAMEAS_X_BEGIN_X_X_VMIN_X_SICC_SICC_ALLCORES" : Operations = 6212; 
+
+####################
+@ Report Format
+####################
+
+@ Data Tracking Level : Sessions
+@ Format : Split
+@ Naming Convention : Test Name, Operation
+@ Columns Order : Type = Alphabetical; 
+
+####################
+@ Post Processing Definition - Please IGNORE
+####################
+
+
